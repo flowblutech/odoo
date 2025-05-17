@@ -9,17 +9,30 @@ ENV DEBIAN_FRONTEND=noninteractive
 # 1) Install Python3, pip (so we have /usr/bin/python3), and the tools to run debinstall.sh
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
+      apt-utils \
       ca-certificates \
-      xz-utils \
       curl \
-      dirmngr \
-      gnupg \
-      python3 \
-      python3-pip \
-      python3-dev \
-      dpkg-dev \
       debhelper \
-      apt-utils && \
+      dirmngr \
+      dpkg-dev \
+      fonts-noto-cjk \
+      gnupg \
+      libssl-dev \
+      node-less \
+      npm \
+      python3 \
+      python3-dev \
+      python3-magic \
+      python3-odf \
+      python3-pdfminer \
+      python3-phonenumbers \
+      python3-pip \
+      python3-pyldap \
+      python3-setuptools \
+      python3-slugify \
+      python3-watchdog \
+      python3-xlwt \
+      xz-utils && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src/odoo
@@ -30,19 +43,19 @@ RUN mkdir -p /usr/src/debian
 COPY setup/debinstall.sh ./debinstall.sh
 COPY debian/control /usr/src/debian/control
 
-RUN chmod +x debinstall.sh && \
-    ./debinstall.sh
-
-# 3) (Optional) remove build‐only packages to slim down the image
-RUN apt-get purge -y --auto-remove \
+RUN chmod +x debinstall.sh \
+ && ./debinstall.sh \
+ \
+ # now drop all the build-only packages and clean up apt caches
+ && apt-get purge -y --auto-remove \
       python3-dev \
       dpkg-dev \
       debhelper \
-      apt-utils && \
-    rm -rf /var/lib/apt/lists/*
-
-# 4) Create an unprivileged 'odoo' user
-RUN useradd -m -d /opt/odoo -U -r -s /usr/sbin/nologin odoo
+      apt-utils \
+ && rm -rf /var/lib/apt/lists/* \
+ \
+ # finally, add our unprivileged odoo user
+ && useradd -m -d /opt/odoo -U -r -s /usr/sbin/nologin odoo
 
 # 5) Copy your Odoo source and entrypoint
 COPY .             /opt/odoo
