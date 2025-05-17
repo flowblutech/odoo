@@ -1,6 +1,7 @@
 name: flowblu-odoo-test-stack
 
 services:
+  # UID/GID = 999(node)
   odoo:
     build:
       context: .
@@ -12,9 +13,10 @@ services:
       - "8069:8069"
     volumes:
       - ${PROD_ODOO_CONFIG_FILE_PATH}:/configs/odoo.conf:ro
-    command: ["--config=/configs/odoo.conf"]
-    # If is first time starting, use the below, it creates the database
-#    command: ["--config=/configs/odoo.conf", "--init base"]
+      - ${HOME}/.docker_volume/prod/odoo/data:/var/lib/odoo
+      - ${HOME}/.docker_volume/prod/odoo/extra-addons:/mnt/extra-addons:ro
+    # Create the database if not created
+    command: ["-i base"]
 
 networks:
   flowblu-cloud-prod-net-docker:

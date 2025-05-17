@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
+cd /opt/odoo
 
-# 1) Require a --config argument
-if [ $# -eq 0 ] || [[ "$1" != --config=* ]]; then
-  echo "❌  Error: you must pass --config=/path/to/odoo.conf" >&2
-  echo "    Usage: $0 --config=/path/to/odoo.conf [other Odoo args]" >&2
-  exit 1
+# always include the core Odoo addons:
+ADDON_PATHS="/opt/odoo/addons"
+
+# only append your extras if there’s at least one __init__.py under it
+if find /mnt/extra-addons -mindepth 2 -maxdepth 2 -type f -name "__init__.py" | read; then
+  ADDON_PATHS="$ADDON_PATHS,/mnt/extra-addons"
 fi
 
-# 2) Run Odoo
-cd /opt/odoo
-exec python3 ./odoo-bin "$@"
+exec python3 ./odoo-bin \
+  --config=/configs/odoo.conf \
+  --addons-path="$ADDON_PATHS" \
+  --data-dir=/var/lib/odoo \
+  "$@"
