@@ -1,0 +1,21 @@
+name: flowblu-odoo-test-stack
+
+services:
+  odoo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: flowblu-odoo:17
+    networks:
+      - flowblu-cloud-prod-net-docker
+    ports:
+      - "8069:8069"
+    volumes:
+      - ${PROD_ODOO_CONFIG_FILE_PATH}:/configs/odoo.conf:ro
+    command: ["--config=/configs/odoo.conf"]
+    # If is first time starting, use the below, it creates the database
+#    command: ["--config=/configs/odoo.conf", "--init base"]
+
+networks:
+  flowblu-cloud-prod-net-docker:
+    external: true
