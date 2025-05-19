@@ -15,6 +15,8 @@ all: help
 # ==================================================================================== #
 ## ===== MAIN COMMANDS =====
 # ==================================================================================== #
+## rebuild: Delete the Container, Image, Build Cache, and Rebuild it
+.PHONY: rebuild
 rebuild:
 	@START=$$(date +%s); \
 	echo 'Starting rebuild...'; \
@@ -29,6 +31,8 @@ rebuild:
 	ELAPSED=$$((END-START)); \
 	echo "Finished rebuilding in $$((ELAPSED/3600))h $$(((ELAPSED%3600)/60))m $$((ELAPSED%60))s. Odoo is running"
 
+## restart: Remove the Container and recreate it
+.PHONY: restart
 restart:
 	@START=$$(date +%s); \
 	echo 'Starting restarting...'; \
